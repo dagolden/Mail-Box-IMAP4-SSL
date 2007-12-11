@@ -1,0 +1,30 @@
+---
+name: Mail-Box-IMAP4-SSL
+version: 0.01
+author:
+  - 'David A. Golden <dagolden@cpan.org>'
+abstract: handle IMAP4 folders over SSL
+license: apache
+resources:
+  license: http://apache.org/licenses/LICENSE-2.0
+  repository: http://dagolden.googlecode.com/svn/
+requires:
+  IO::Socket::SSL: 1.12
+  Mail::Box: 2.079
+  Mail::IMAPClient: 3.02
+  perl: 5.006
+build_requires:
+  Test::Exception: 0.25
+  Test::More: 0.74
+provides:
+  Mail::Box::IMAP4::SSL:
+    file: lib/Mail/Box/IMAP4/SSL.pm
+    version: 0.01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+no_index:
+  directory:
+    - examples
+    - inc
