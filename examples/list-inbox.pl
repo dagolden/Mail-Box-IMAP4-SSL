@@ -10,14 +10,16 @@ my ($username,$password, $server);
     local $|; $|++;
     print "username: "; chomp($username = <>);
     print "password: "; chomp($password = <>);
-    print "server  : "; chomp($password = <>);
+    print "server  : "; chomp($server = <>);
 }
     
-my $inbox = Mail::Box::IMAP4::SSL->new(
+my $imaps = Mail::Box::IMAP4::SSL->new(
     username => $username,
     password => $password,
     server_name => $server,
-    folder => "INBOX",
-);
+    folder => 'INBOX',
+) or die "Problems creating IMAP4::SSL object\n";
 
-print $_->get('Subject') . "\n" for $inbox->messages();
+print "Connected to $server.\n";
+
+print $_->get('Subject') . "\n" for $imaps->messages();

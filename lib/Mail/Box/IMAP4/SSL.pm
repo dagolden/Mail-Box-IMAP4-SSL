@@ -24,12 +24,18 @@ sub init {
     # if no port is provided, use the default
     $args->{server_port} ||= $imaps_port;
 
+    # Mail::Box::IMAP4 wants a folder or it throws warnings
+    $args->{folder} ||= '/';
+
+    # Use messages classes from our superclass type
+    $args->{message_type} ||= 'Mail::Box::IMAP4::Message';
+
     # giving us a transport argument is an error since our only purpose
     # is to create the right kind of transport object
-    if ( $args->{transport} ) {
-        $self->Mail::Box::Net::init( { %$args, transport => {}, folder => '/' } );
+    if ( $args->{transporter} ) {
+        $self->Mail::Box::Net::init( { %$args, transporter => {}, folder => '/' } );
         $self->log(ERROR => 
-            "The 'transport' option is not valid for " . __PACKAGE__
+            "The 'transporter' option is not valid for " . __PACKAGE__
         );
         return;
     }
@@ -37,7 +43,7 @@ sub init {
     # some arguments are required to connect to a server
     for my $req ( qw/ server_name username password/ ) {
         if ( not defined $args->{$req} ) {
-            $self->init( { %$args, transport => {}, folder => '/' } );
+            $self->Mail::Box::Net::init( { %$args, transporter => {}, folder => '/' } );
             $self->log(ERROR =>  
                 "The '$req' option is required for " . __PACKAGE__ 
             );
@@ -54,6 +60,7 @@ sub init {
     );
     
     unless ( $ssl_socket ) {
+        $self->Mail::Box::Net::init( { %$args, transporter => {}, folder => '/' } );
         $self->log(ERROR => 
             "Couldn't connect to '@{[$args->{server_name}]}': " 
             . IO::Socket::SSL::errstr()
@@ -64,24 +71,27 @@ sub init {
     my $imap = Mail::IMAPClient->new( 
         User     => $args->{username},
         Password => $args->{password},
-        Socket   => $args->{server_port},
+        Socket   => $ssl_socket,
         Uid      => 1,              # Mail::Transport::IMAP4 does this
         Peek     => 1,              # Mail::Transport::IMAP4 does this
     );
+    my $imap_err = $@;
         
     unless ( $imap && $imap->IsAuthenticated ) {
+        $self->Mail::Box::Net::init( { %$args, transporter => {}, folder => '/' } );
         $self->log( ERROR => 
             "Login rejected for user '@{[$args->{username}]}'"
-            . " on server '@{[$args->{server_name}]}'."
+            . " on server '@{[$args->{server_name}]}': $imap_err"
         );
         return;
     }
 
-    $args->{transport} = Mail::Transport::IMAP4->new(
+    $args->{transporter} = Mail::Transport::IMAP4->new(
         imap_client => $imap,
     );
         
-    unless ( $args->{transport} ) {
+    unless ( $args->{transporter} ) {
+        $self->Mail::Box::Net::init( { %$args, transport => {}, folder => '/' } );
         $self->log( ERROR => 
             "Error creating Mail::Box::Transport from the SSL connection."
         );

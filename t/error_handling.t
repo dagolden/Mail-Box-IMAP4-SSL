@@ -32,12 +32,12 @@ require_ok( $package );
 {
     my ($imap, $stdout, $stderr);
     capture sub {
-        $imap = Mail::Box::IMAP4::SSL->new( transport => {} );
+        $imap = Mail::Box::IMAP4::SSL->new( transporter => {} );
     } => \$stdout, \$stderr;
     
-    is( $imap, undef, "Using 'transport' option: no object created" );  
-    like( $stderr, qr/\QThe 'transport' option is not valid for $package\E/,
-        "Using 'transport' option: error message correct"
+    is( $imap, undef, "Using 'transporter' option: no object created" );  
+    like( $stderr, qr/\QThe 'transporter' option is not valid for $package\E/,
+        "Using 'transporter' option: error message correct"
     );
 }
 
