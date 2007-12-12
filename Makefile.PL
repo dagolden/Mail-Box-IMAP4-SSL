@@ -8,11 +8,15 @@ WriteMakefile
           'EXE_FILES' => [],
           'VERSION_FROM' => 'lib/Mail/Box/IMAP4/SSL.pm',
           'PREREQ_PM' => {
-                           'Test::More' => '0.74',
                            'Mail::IMAPClient' => '3.02',
-                           'Test::Exception' => '0.25',
+                           'Mail::Transport::IMAP4' => '2.079',
                            'IO::Socket::SSL' => '1.12',
-                           'Mail::Box' => '2.079'
+                           'IO::CaptureOutput' => '1.06',
+                           'File::Spec' => '0.86',
+                           'Test::More' => '0.74',
+                           'Probe::Perl' => '0.01',
+                           'Proc::Background' => '1.08',
+                           'Mail::Box::IMAP4' => '2.079'
                          }
         )
 ;

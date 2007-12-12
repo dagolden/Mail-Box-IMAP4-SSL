@@ -18,6 +18,7 @@ add_stopwords( qw(
     STDOUT
     XS
     co
+    aka
 ));
 
 all_pod_files_spelling_ok();

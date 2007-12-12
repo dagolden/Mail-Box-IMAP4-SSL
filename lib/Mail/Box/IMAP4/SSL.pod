@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Mail::Box::IMAP4::SSL - handle IMAP4 folders over SSL
+Mail::Box::IMAP4::SSL - handle IMAP4 folders with SSL
 
 =head1 VERSION
 
@@ -48,10 +48,11 @@ for documentation.
      );
 
 The C<<< username >>>, C<<< password >>> and C<<< server_name >>> options arguments are required.
-See L<Mail::Box::IMAP4> for additional options.
+The C<<< server_port >>> option is automatically set to the standard IMAPS port 993,
+but can be changed if needed. See L<Mail::Box::IMAP4> for additional options.
 
-Note: It is an error to provide a C<<< transport >>> options, as this class exists
-only to create an SSL-secured C<<< transport >>> for C<<< Mail::Box::IMAP4 >>>.
+Note: It is an error to provide a C<<< transporter >>> options, as this class exists
+only to create an SSL-secured C<<< transporter >>> for C<<< Mail::Box::IMAP4 >>>.
 
 =head1 BUGS
 
