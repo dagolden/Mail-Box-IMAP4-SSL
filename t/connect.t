@@ -7,45 +7,54 @@ use warnings;
 #--------------------------------------------------------------------------#
 
 use Test::More;
+use Proc::Background;
+use File::Spec;
+use IO::CaptureOutput qw/capture/;
+use Probe::Perl;
 
-my $username = $ENV{PERL_GMAIL_BOX_TEST};
-my ($password, $server);
 
-if ( $username ) {
-    print STDERR "\n\nEnter password for $username:\n";
-    chomp( $password = <> );
+# expected credentials for server and client
+my $username = 'johndoe';
+my $password = '123456';
+my $port = '31415';
+
+# fire up the local mock server or skip tests
+my $imapd = Proc::Background->new(
+    { die_upon_destroy => 1 },
+    Probe::Perl->find_perl_interpreter(),
+    File::Spec->rel2abs(File::Spec->catfile(qw/t bin imapd.pl/)), 
+    $port,
+    $username, 
+    $password,
+);
+
+unless ( $imapd && $imapd->alive ) {
+    plan skip_all => "Couldn't launch mock imapd on localhost"
 }
 
-if ( ! ($username && $password ) ) {
-    plan skip_all => 'Test email/password not provided. (See documentation.)';
-}
-else {
-    plan tests =>  2 ;
-}
+plan tests =>  4 ;
 
-my ($gmail, $err);
+my ($stdout, $stderr);
 
 #--------------------------------------------------------------------------#
 # tests begin here
 #--------------------------------------------------------------------------#
 
-require_ok( 'GMail::Box' );
+require_ok( 'Mail::Box::IMAP4::SSL' );
 
-SKIP: {
-    eval {
-        $gmail = GMail::Box->new(
-            username => $username,
-            password => $password,
-        );
-    };
+ok( $imapd->alive, "mock imapd server is alive" );
 
-    $err = $@;
+my $imap;
 
-    if ( $err =~ m{^Invalid user/password} ) {
-        skip "Invalid username or password provided", 1;
-    }
-    else {
-        isa_ok( $gmail, "GMail::Box" );
-    }
-}
+capture sub {
+    $imap = Mail::Box::IMAP4::SSL->new(
+        username => $username,
+        password => $password,
+        server_name => '127.0.0.1',
+        server_port => $port,
+    );
+} => \$stdout, \$stderr;
+
+ok( $imap, "connected to mock imapd" );
+is( $stderr, q{}, "No warnings during connection" );
 
