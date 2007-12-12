@@ -28,6 +28,8 @@ my $imapd = Proc::Background->new(
     $password,
 );
 
+sleep 2; # give time for imapd to fire up and listen
+
 unless ( $imapd && $imapd->alive ) {
     plan skip_all => "Couldn't launch mock imapd on localhost"
 }
