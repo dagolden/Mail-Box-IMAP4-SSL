@@ -4,22 +4,24 @@ use strict;
 use warnings;
 
 use base 'Mail::Box::IMAP4';
-use IO::Socket::SSL;
-use Mail::Transport::IMAP4;
+use IO::Socket::SSL qw();
+use Mail::Reporter qw();
+use Mail::Transport::IMAP4 qw();
 
-our $VERSION = '0.01'; 
+our $VERSION = '0.02'; 
 
 my $imaps_port = 993; # standard port for IMAP over SSL
 
 #--------------------------------------------------------------------------#
 # init
-# 
-# for errors before we do the normal superclass init, we need to do an 
-# emergency init to Mail::Box::Net bootstrap enough init for reporting
 #--------------------------------------------------------------------------#
 
 sub init {
     my ($self, $args) = @_;
+
+    # until we're connected, mark as closed in case we exit early
+    # (otherwise, Mail::Box::DESTROY will try to close/unlock, which dies)
+    $self->{MB_is_closed}++;
 
     # if no port is provided, use the default
     $args->{server_port} ||= $imaps_port;
@@ -33,8 +35,7 @@ sub init {
     # giving us a transport argument is an error since our only purpose
     # is to create the right kind of transport object
     if ( $args->{transporter} ) {
-        $self->Mail::Box::Net::init( $args );
-        $self->log(ERROR => 
+        Mail::Reporter->log(ERROR => 
             "The 'transporter' option is not valid for " . __PACKAGE__
         );
         return;
@@ -43,8 +44,7 @@ sub init {
     # some arguments are required to connect to a server
     for my $req ( qw/ server_name username password/ ) {
         if ( not defined $args->{$req} ) {
-            $self->Mail::Box::Net::init( $args );
-            $self->log(ERROR =>  
+            Mail::Reporter->log(ERROR =>  
                 "The '$req' option is required for " . __PACKAGE__ 
             );
             return;
@@ -60,9 +60,8 @@ sub init {
     );
     
     unless ( $ssl_socket ) {
-        $self->Mail::Box::Net::init( $args );
-        $self->log(ERROR => 
-            "Couldn't connect to '@{[$args->{server_name}]}': " 
+        Mail::Reporter->log(ERROR => 
+            "Couldn't connect to '$args->{server_name}': " 
             . IO::Socket::SSL::errstr()
         );
         return;
@@ -78,10 +77,9 @@ sub init {
     my $imap_err = $@;
         
     unless ( $imap && $imap->IsAuthenticated ) {
-        $self->Mail::Box::Net::init( $args );
-        $self->log( ERROR => 
-            "Login rejected for user '@{[$args->{username}]}'"
-            . " on server '@{[$args->{server_name}]}': $imap_err"
+        Mail::Reporter->log( ERROR => 
+            "Login rejected for user '$args->{username}'"
+            . " on server '$args->{server_name}': $imap_err"
         );
         return;
     }
@@ -91,14 +89,15 @@ sub init {
     );
         
     unless ( $args->{transporter} ) {
-        $self->Mail::Box::Net::init( $args );
-        $self->log( ERROR => 
+        Mail::Reporter->log( ERROR => 
             "Error creating Mail::Transport::IMAP4 from the SSL connection."
         );
         return;
     }
     
-    # now that we have a valid transporter, let the superclass take over
+    # now that we have a valid transporter, mark ourselves open
+    # and let the superclass take over
+    delete $self->{MB_is_closed};
     return $self->SUPER::init($args); 
 }
 

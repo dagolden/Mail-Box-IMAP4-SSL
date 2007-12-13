@@ -2,7 +2,7 @@ NAME
     Mail::Box::IMAP4::SSL - handle IMAP4 folders with SSL
 
 VERSION
-    This documentation describes version 0.01.
+    This documentation describes version 0.02.
 
 INHERITANCE
          Mail::Box::IMAP4::SSL

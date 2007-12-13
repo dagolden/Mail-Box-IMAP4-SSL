@@ -1,4 +1,9 @@
 Revision history for Perl module Mail::Box::IMAP4::SSL
 
+0.02 Thu Dec 13 07:27:28 EST 2007
+
+    - cleaned up error handling code
+
 0.01 Wed Dec 12 08:43:36 EST 2007
+
     - initial public release
