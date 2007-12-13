@@ -1,6 +1,6 @@
 ---
 name: Mail-Box-IMAP4-SSL
-version: 0.02
+version: 0.03
 author:
   - 'David A. Golden <dagolden@cpan.org>'
 abstract: handle IMAP4 folders with SSL
@@ -23,8 +23,8 @@ build_requires:
 provides:
   Mail::Box::IMAP4::SSL:
     file: lib/Mail/Box/IMAP4/SSL.pm
-    version: 0.02
-generated_by: Module::Build version 0.2808
+    version: 0.03
+generated_by: Module::Build version 0.280801
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
   version: 1.2

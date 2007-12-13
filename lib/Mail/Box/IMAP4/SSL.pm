@@ -8,7 +8,7 @@ use IO::Socket::SSL qw();
 use Mail::Reporter qw();
 use Mail::Transport::IMAP4 qw();
 
-our $VERSION = '0.02'; 
+our $VERSION = '0.03'; 
 
 my $imaps_port = 993; # standard port for IMAP over SSL
 
