@@ -20,11 +20,23 @@ This documentation describes version 0.03.
 
 =head1 SYNOPSIS
 
+     # standalone
      use Mail::Box::IMAP4::SSL;
+ 
      my $folder = new Mail::Box::IMAP4::SSL(
          username => 'johndoe',
-         password => 'x_marks_the_spot',
+         password => 'wbuaqbr',
          server_name => 'imap.example.com',
+     );
+ 
+     # with Mail::Box::Manager
+     use Mail::Box::Manager;
+ 
+     my $mbm = Mail::Box::Manager->new;
+     $mbm->registerType( imaps => 'Mail::Box::IMAP4::SSL' );
+ 
+     my $inbox = $mbm->open(
+         folder => 'imaps://johndoe:wbuaqbr@imap.example.com/INBOX',
      );
 
 =head1 DESCRIPTION
@@ -42,7 +54,7 @@ for documentation.
 
      my $folder = new Mail::Box::IMAP4::SSL(
          username => 'johndoe',
-         password => 'x_marks_the_spot',
+         password => 'wbuaqbr',
          server_name => 'imap.example.com',
          %other_options
      );

@@ -10,6 +10,7 @@ use Test::More;
 use Proc::Background;
 use File::Spec;
 use IO::CaptureOutput qw/capture/;
+use Mail::Box::Manager;
 use Probe::Perl;
 
 
@@ -34,7 +35,7 @@ unless ( $imapd && $imapd->alive ) {
     plan skip_all => "Couldn't launch mock imapd on localhost"
 }
 
-plan tests =>  7 ;
+plan tests =>  3 ;
 
 my ($stdout, $stderr, $rc);
 
@@ -42,29 +43,17 @@ my ($stdout, $stderr, $rc);
 # tests begin here
 #--------------------------------------------------------------------------#
 
-require_ok( 'Mail::Box::IMAP4::SSL' );
-
 ok( $imapd->alive, "mock imapd server is alive" );
 
-my $imap;
+my $mbm = Mail::Box::Manager->new;
 
-capture sub {
-    $imap = Mail::Box::IMAP4::SSL->new(
-        username => $username,
-        password => $password,
-        server_name => '127.0.0.1',
-        server_port => $port,
-    );
-} => \$stdout, \$stderr;
+$mbm->registerType( 'imaps', 'Mail::Box::IMAP4::SSL' );
+
+my $imap = $mbm->open(
+    folder => "imaps://$username\:$password\@127.0.0.1:$port/"
+);
 
 ok( $imap, "connected to mock imapd" );
-is( $stderr, q{}, "No warnings during connection" );
-
-capture sub { $rc = $imap->close } => \$stdout, \$stderr;
-
-ok( $rc, "close() returned true value" );
-ok( $imap->{MB_is_closed}, "internal close flag set" );
-is( $stderr, q{}, "no warnings during close" );
-
+is( $imap->type, 'imaps', "imaps folder has correct type" ); 
 
 

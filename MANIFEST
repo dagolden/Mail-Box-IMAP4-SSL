@@ -18,6 +18,7 @@ t/certs/server-cert.pem
 t/certs/server-key.pem
 t/connect.t
 t/error_handling.t
+t/manager.t
 Todo
 xt/critic.t
 xt/perlcriticrc

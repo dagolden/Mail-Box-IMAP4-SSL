@@ -1,6 +1,4 @@
 TODO list for Perl module Mail::Box::IMAP4::SSL
 
-- Define our type different than IMAP4.  When opened via a Mail::Box::Manager,
-  be sure to register our type with the manager.  
-
+- add some todos
 

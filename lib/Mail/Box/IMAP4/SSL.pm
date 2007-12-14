@@ -96,10 +96,13 @@ sub init {
     }
     
     # now that we have a valid transporter, mark ourselves open
-    # and let the superclass take over
+    # and let the superclass initialize
     delete $self->{MB_is_closed};
-    return $self->SUPER::init($args); 
+    $self->SUPER::init($args); 
+
 }
+
+sub type {'imaps'}
 
 1; #modules must return true
 
@@ -129,13 +132,25 @@ This documentation describes version %%VERSION%%.
 
 = SYNOPSIS
 
+    # standalone
     use Mail::Box::IMAP4::SSL;
+
     my $folder = new Mail::Box::IMAP4::SSL(
         username => 'johndoe',
-        password => 'x_marks_the_spot',
+        password => 'wbuaqbr',
         server_name => 'imap.example.com',
     );
-        
+
+    # with Mail::Box::Manager
+    use Mail::Box::Manager;
+
+    my $mbm = Mail::Box::Manager->new;
+    $mbm->registerType( imaps => 'Mail::Box::IMAP4::SSL' );
+    
+    my $inbox = $mbm->open(
+        folder => 'imaps://johndoe:wbuaqbr@imap.example.com/INBOX',
+    );
+
 = DESCRIPTION
 
 This is a thin subclass of [Mail::Box::IMAP4] to provide IMAP over SSL (aka
@@ -152,7 +167,7 @@ for documentation.
 
     my $folder = new Mail::Box::IMAP4::SSL(
         username => 'johndoe',
-        password => 'x_marks_the_spot',
+        password => 'wbuaqbr',
         server_name => 'imap.example.com',
         %other_options
     );
