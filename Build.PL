@@ -32,7 +32,7 @@ $class->new(
             }],
         },
         resources => {
-            repository => 'http://dagolden.googlecode.com/svn/'
+            repository => 'https://github.com/dagolden/mail-box-imap4-ssl'
         },
     },
 )->create_build_script;
